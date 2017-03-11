@@ -27,7 +27,7 @@ let tracks = [
 
 let players = _.map(tracks, function(track){
     return new Tone.Player({
-        "url" : track,
+        "url" : track.filename,
         "loop" : true,
         "autostart": false
     });
