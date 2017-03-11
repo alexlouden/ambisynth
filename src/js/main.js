@@ -7,6 +7,37 @@ var tracks = [
     './audio/1/6-Beads.mp3'
 ];
 
+            // <div>
+            //     <h5>Bass</h5>
+            //     <input type="range" min="0" value="50" max="100" step="1">
+            //     <button>shh</button>
+            // </div>
+            // <div>
+            //     <h5>Emotion</h5>
+            //     <input type="range" min="0" value="50" max="100" step="1">
+            //     <button>shh</button>
+            // </div>
+            // <div>
+            //     <h5>Glass</h5>
+            //     <input type="range" min="0" value="50" max="100" step="1">
+            //     <button>shh</button>
+            // </div>
+            // <div>
+            //     <h5>Hats</h5>
+            //     <input type="range" min="0" value="50" max="100" step="1">
+            //     <button>shh</button>
+            // </div>
+            // <div>
+            //     <h5>Kick</h5>
+            //     <input type="range" min="0" value="50" max="100" step="1">
+            //     <button>shh</button>
+            // </div>
+            // <div>
+            //     <h5>Beads</h5>
+            //     <input type="range" min="0" value="50" max="100" step="1">
+            //     <button>shh</button>
+            // </div>
+
 var players = _.map(tracks, function(track){
     return new Tone.Player({
         "url" : track,
