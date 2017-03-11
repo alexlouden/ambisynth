@@ -5,8 +5,10 @@ del        = require 'del'
 
 # CSS
 sass       = require 'gulp-sass'
+autoprefix = require 'autoprefixer'
+postcss    = require 'gulp-postcss'
+assets     = require 'postcss-assets'
 sourcemaps = require 'gulp-sourcemaps'
-cssmin     = require 'gulp-cssmin'
 
 # HTML
 minifyHTML = require 'gulp-minify-html'
@@ -33,6 +35,10 @@ gulp.task 'styles', ->
   sassStream = gulp.src 'src/css/*.sass'
     .pipe sourcemaps.init()
     .pipe sass().on 'error', sass.logError
+    .pipe postcss [
+      autoprefix browsers: 'last 2 versions'
+      assets loadPaths: ['src/assets'] # noop for now
+    ]
     .pipe sourcemaps.write()
     .pipe concat 'sass.css'
 
