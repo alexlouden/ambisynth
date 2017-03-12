@@ -2,6 +2,7 @@
 gulp       = require 'gulp'
 merge      = require 'merge-stream'
 del        = require 'del'
+gutil      = require 'gulp-util'
 
 # CSS
 sass       = require 'gulp-sass'
@@ -36,8 +37,10 @@ gulp.task 'styles', ->
     .pipe sourcemaps.init()
     .pipe sass().on 'error', sass.logError
     .pipe postcss [
-      autoprefix browsers: 'last 2 versions'
-      assets loadPaths: ['src/assets'] # noop for now
+      autoprefix
+        browsers: 'last 2 versions'
+      # assets
+      #   loadPaths: ['src/assets'] # noop for now
     ]
     .pipe sourcemaps.write()
     .pipe concat 'sass.css'
@@ -55,6 +58,9 @@ gulp.task 'scripts', ->
     .pipe sourcemaps.init()
     .pipe babel
       presets: ['es2015']
+    .on 'error', (e) ->
+      gutil.log gutil.colors.red 'Babel error:\n' + e.message
+      @emit 'end'
     .pipe webpackStr
         output: filename: 'app.js'
       , webpack
