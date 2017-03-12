@@ -1,4 +1,6 @@
 import _ from 'underscore'
+import React from 'react'
+import ReactDOM from 'react-dom'
 import $ from 'jQuery'
 import Tone from 'Tone'
 
@@ -94,3 +96,35 @@ let onChangeVolume = function(e) {
 $('.slider input').each( (id, obj) =>
     $(obj).on('input', _.throttle(onChangeVolume, 30))
 )
+
+
+class Slider extends React.Component {
+  render() {
+    return (
+      <div>
+        <h5>{this.props.name}</h5>
+        <input type="range" min="0" value="50" max="100" step="1"/>
+        <button className="mute">mute</button>
+        <button className="solo">solo</button>
+      </div>
+    )
+  }
+}
+
+class SliderList extends React.Component {
+
+  render() {
+    return (
+      <div>
+        {this.props.tracks.map( track =>
+          <Slider name={track.name}/>
+        )}
+      </div>
+    )
+  }
+}
+
+ReactDOM.render(
+  <SliderList tracks={tracks}/>,
+  document.getElementById('mixer')
+);

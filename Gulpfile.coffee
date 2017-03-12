@@ -15,19 +15,34 @@ sourcemaps = require 'gulp-sourcemaps'
 minifyHTML = require 'gulp-minify-html'
 
 # JS
-babel      = require 'gulp-babel'
-webpack    = require('webpack')
+webpack    = require 'webpack'
 webpackStr = require 'webpack-stream'
 uglify     = require 'gulp-uglify'
 concat     = require 'gulp-concat'
 
 # serve & LR
-server = require 'gulp-server-livereload'
+server     = require 'gulp-server-livereload'
 
 # config
 serverport = 5001
 
 ######
+
+webpackConfig =
+  entry:
+    index: './src/js/app.jsx'
+  output:
+    filename: 'app.js'
+  module:
+    loaders: [
+      test:  /\.jsx?$/
+      exclude: /(node_modules|bower_components)/
+      loader: 'babel-loader'
+      query:
+        presets: ['react', 'es2015']
+    ]
+
+# console.log webpackConfig.modules.loaders
 
 gulp.task 'clean', -> del ['dist']
 
@@ -54,16 +69,13 @@ gulp.task 'styles', ->
 
 
 gulp.task 'scripts', ->
-  gulp.src 'src/js/app.js'
+  gulp.src '.'
     .pipe sourcemaps.init()
-    .pipe babel
-      presets: ['es2015']
+    # .pipe named()
+    .pipe webpackStr(webpackConfig, webpack)
     .on 'error', (e) ->
-      gutil.log gutil.colors.red 'Babel error:\n' + e.message
+      # gutil.log gutil.colors.red 'Webpack error:\n' + e.message
       @emit 'end'
-    .pipe webpackStr
-        output: filename: 'app.js'
-      , webpack
     .pipe sourcemaps.write '.'
     .pipe gulp.dest 'dist/js'
 
