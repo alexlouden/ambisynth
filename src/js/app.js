@@ -31,6 +31,12 @@ class Track {
         return Math.exp(db / 20) * 100
     }
     set volume(perc) {
+
+        if (perc == 0) {
+            this.mute = true
+            return
+        }
+
         // Set volume as percentage 0-100
         let db = 20 * Math.log(perc / 100)
         this.player.volume.value = db
@@ -80,13 +86,8 @@ let onChangeVolume = function(e) {
 
     let id = $(this).closest('.slider').index()
     let track = tracks[id]
-    console.log(id)
 
-    if ($(this).val() == 0) {
-        track.mute = true
-    } else {
-        track.volume = $(this).val()
-    }
+    track.volume = $(this).val()
 }
 
 // Throttle per slider, not across all sliders
