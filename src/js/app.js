@@ -56,9 +56,10 @@ window.tracks = tracks
 // </div>
 
 
-Tone.Buffer.on('load', e =>
+Tone.Buffer.on('load', e => {
     tracks.map(track => track.onLoad())
-)
+    $('.slider input').trigger('input')
+})
 
 $('#mixer .mute').on('click', e => {
     e.preventDefault()
@@ -79,6 +80,7 @@ let onChangeVolume = function(e) {
 
     let id = $(this).closest('.slider').index()
     let track = tracks[id]
+    console.log(id)
 
     if ($(this).val() == 0) {
         track.mute = true
@@ -87,5 +89,7 @@ let onChangeVolume = function(e) {
     }
 }
 
-$('#mixer input').on('input', _.throttle(onChangeVolume, 30))
-$('#mixer input').trigger('input')
+// Throttle per slider, not across all sliders
+$('.slider input').each( (id, obj) =>
+    $(obj).on('input', _.throttle(onChangeVolume, 30))
+)
