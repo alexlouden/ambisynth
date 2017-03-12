@@ -78,11 +78,11 @@ class Slider extends React.Component {
     return (
       <div className="slider">
         <h5>{this.props.track.name}</h5>
+        <button className="mute">mute</button>
+        <button className="solo">solo</button>
         <div className="range">
           <input type="range" min="0" value={this.state.value} max="100" step="1" onChange={this.handleChange}/>
         </div>
-        <button className="mute">mute</button>
-        <button className="solo">solo</button>
       </div>
     )
   }
@@ -104,4 +104,4 @@ class SliderList extends React.Component {
 ReactDOM.render(
   <SliderList tracks={tracks}/>,
   document.getElementById('main')
-);
+)

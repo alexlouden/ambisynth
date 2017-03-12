@@ -1,17 +1,31 @@
 @import "reset"
 @import "bourbon/bourbon"
 
-
 ////////////////////////////////////////////
 //            Colours and Fonts           //
 ////////////////////////////////////////////
 
+$button-grey: #67666B
+$mute-button-orange: #FCC1A4
+$mute-button-yellow: #FFEC6C
 
 // TODO add mute/solo buttons
 // TODO try white knobs
 // TODO selector for track 1 or 2
 // TODO rack rails, better mixer body details and textures
 // fix shadow directions
+
+@mixin border-curve($top, $side)
+  border-top-left-radius: $top $side
+  border-top-right-radius: $top $side
+  border-bottom-left-radius: $top $side
+  border-bottom-right-radius: $top $side
+
+@mixin button-led($color)
+  background: radial-gradient(circle, tint($color, 30%) 20%, $color 70%)
+
+@mixin button-mute()
+  background: radial-gradient(circle, $mute-button-orange 20%, $mute-button-yellow 70%)
 
 ////////////////////////////////////////////
 //                  Layout                //
@@ -24,10 +38,10 @@ html
 body
   background: url('../assets/bg.jpg') center center #150704
 
-.mixer
+#main
+  text-align: center
 
-  height: 600px
-  width: 530px
+.mixer
   margin: 150px auto 50px
   padding: 25px 10px
 
@@ -36,46 +50,13 @@ body
   position: relative
   overflow: hidden
 
-  background: linear-gradient(#17181A 0%, #17181A 15%, #5F646A 15.5%, #5F646A 100%)
-
+  background: linear-gradient(#17181A 0%, #17181A 33%, #5F646A 33.3%, #5F646A 100%)
   box-shadow: 0 0 5px black inset, 0 0 2px 3px rgba(60, 60, 60, 0.7) inset, 5px 5px 2px 1px rgba(255, 255, 255, 0.6) inset
 
-  display: flex
+  display: inline-flex
   flex-direction: row
 
-  .range
-    transform: rotate(270deg) translateX(-500px)
-    transform-origin: 0 0
-
-    input[type=range]
-      display: block
-      width: 500px
-      height: 30px
-
-  .slider
-    display: block
-    height: 500px
-    width: 30px
-    position: relative
-    margin-top: 90px
-    margin-bottom: 15px
-    margin-left: 30px
-    margin-right: 30px
-
-    &:after
-      // the thin white line
-      content: ""
-      position: absolute
-      left: 60px
-      top: -80px
-      bottom: -10px
-      width: 1px
-      background-color: rgba(255, 255, 255, 0.7)
-      transform: scaleX(1.5)
-
-    &:last-of-type:after
-      // hide last separating line
-      display: none
+  $slider-width: 40px
 
   h5
     position: absolute
@@ -92,17 +73,76 @@ body
     color: rgba(255, 255, 255, 0.8)
 
   button
-    display: none
-    position: absolute
-    right: -50px
-    top: 0
-    width: 40px
-    height: 30px
+    position: relative
+    width: 38px
+    height: 20px
     padding: 5px
+    margin-bottom: 10px
+    margin-left: -5px
 
+    color: white
+    text-indent: 39px
+    font-size: 7px
+    text-transform: uppercase
+
+    +border-curve(20px, 3px)
+    border: 1px solid black
+    outline: none
+
+    +button-led($button-grey)
+    box-shadow: 0 0 2px 0.6px black, 0 0 5px 1px transparentize(white, 0.6), 0 0 5px black inset, 1.5px 1px 1px transparentize(white, 0.3) inset, -0.5px 0 1px transparentize(white, 0.4) inset
+
+    &:hover
+      +button-led(shade($button-grey, 30%))
+      box-shadow: 0 0 2px 0.6px black, 0 0 5px 1px transparentize(white, 0.9), 0 0 10px black inset, 1.5px 1px 1px transparentize(black, 0.3) inset, -0.5px 0 1px transparentize(black, 0.4) inset
+
+    &.active
+      +button-mute()
+      box-shadow: 0 0 2px 0.6px black, 0 0 5px 1px transparentize($mute-button-yellow, 0.6), 0 0 5px black inset, 1.5px 1px 1px transparentize(white, 0.3) inset, -0.5px 0 1px transparentize(white, 0.4) inset
+
+      &:hover
+        +button-led(shade($mute-button-orange, 20%))
+
+    // &:active, &:focus
+
+  .slider
+    display: block
+    width: $slider-width
+    position: relative
+    margin-top: 80px
+    margin-bottom: 15px
+    margin-left: 30px
+    padding-right: 30px
+
+    &:after
+      // the thin white line
+      content: ""
+      position: absolute
+      right: 0
+      top: -80px
+      bottom: -20px
+      width: 1px
+      background-color: rgba(255, 255, 255, 0.7)
+      transform: scaleX(1.5)
+
+    &:last-of-type:after
+      // hide last separating line
+      display: none
+
+  .range
+    transform: rotate(270deg) translateX(-345px)
+    transform-origin: 0 0
+    height: 345px
+
+    input[type=range]
+      display: block
+      width: 300px
+      height: $slider-width
 
 input[type=range]
+
   -webkit-appearance: none
+  -moz-appearance: none
   width: 100%
   margin: 0.7px 0
   background-color: transparent
@@ -129,8 +169,5 @@ input[type=range]
     background: linear-gradient(to right, rgba(248,80,50,1) 0%, rgba(240,47,23,1) 48%, rgba(62,29,27,1) 51%, rgba(240,47,23,1) 55%, rgba(231,56,39,1) 100%)
     cursor: pointer
     -webkit-appearance: none
-    border-top-right-radius: 5px 20px
-    border-bottom-right-radius: 5px 20px
-    border-top-left-radius: 5px 20px
-    border-bottom-left-radius: 5px 20px
+    +border-curve(5px, 20px)
     margin-top: -10px
