@@ -8,8 +8,9 @@
 $button-grey: #67666B
 $mute-button-orange: #FCC1A4
 $mute-button-yellow: #FFEC6C
+$solo-button-orange: #E29993
+$solo-button-yellow: #FCB064
 
-// TODO add mute/solo buttons
 // TODO try white knobs
 // TODO selector for track 1 or 2
 // TODO rack rails, better mixer body details and textures
@@ -21,11 +22,31 @@ $mute-button-yellow: #FFEC6C
   border-bottom-left-radius: $top $side
   border-bottom-right-radius: $top $side
 
-@mixin button-led($color)
-  background: radial-gradient(circle, tint($color, 30%) 20%, $color 70%)
+@mixin button-led-bg($color, $tint:30%)
+  background: radial-gradient(circle, tint($color, $tint) 20%, $color 70%)
 
-@mixin button-mute()
-  background: radial-gradient(circle, $mute-button-orange 20%, $mute-button-yellow 70%)
+@mixin button-mute($shade:0%)
+  background: radial-gradient(circle, shade($mute-button-orange, $shade) 20%, shade($mute-button-yellow, $shade) 70%)
+
+@mixin button-solo($shade:0%)
+  background: radial-gradient(ellipse 15px 20px, shade($solo-button-orange, $shade) 30%, shade($solo-button-yellow, $shade) 90%)
+
+@mixin button-led($state:"normal", $glowcolor:transparent)
+  $outline: 0 0 2px 0.6px black
+  $glow: 0 0 6px 1px $glowcolor
+  $shape: 0 0 5px black inset
+  $highlight-l: 1.5px 1px 1px transparentize(white, 0.3) inset
+  $highlight-r: -0.5px 0 1px transparentize(white, 0.4) inset
+
+  @if $state == "normal"
+    // Inherit
+
+  @elseif $state == "hover"
+    $shape: 0 0 10px black inset
+    $highlight-l: 1.5px 1px 1px transparentize(black, 0.3) inset
+    $highlight-r: -0.5px 0 1px transparentize(black, 0.4) inset
+
+  box-shadow: #{$outline}, #{$glow}, #{$shape}, #{$highlight-l}, #{$highlight-r}
 
 ////////////////////////////////////////////
 //                  Layout                //
@@ -50,7 +71,9 @@ body
   position: relative
   overflow: hidden
 
-  background: linear-gradient(#17181A 0%, #17181A 33%, #5F646A 33.3%, #5F646A 100%)
+  $dark: #17181A
+  $light: #5F646A
+  background: linear-gradient($light 0%, $light 16%, $dark 16.5%, $dark 33%, $light 33.3%, $light 100%)
   box-shadow: 0 0 5px black inset, 0 0 2px 3px rgba(60, 60, 60, 0.7) inset, 5px 5px 2px 1px rgba(255, 255, 255, 0.6) inset
 
   display: inline-flex
@@ -77,7 +100,7 @@ body
     width: 38px
     height: 20px
     padding: 5px
-    margin-bottom: 10px
+    margin-top: 10px
     margin-left: -5px
 
     color: white
@@ -89,20 +112,30 @@ body
     border: 1px solid black
     outline: none
 
-    +button-led($button-grey)
-    box-shadow: 0 0 2px 0.6px black, 0 0 5px 1px transparentize(white, 0.6), 0 0 5px black inset, 1.5px 1px 1px transparentize(white, 0.3) inset, -0.5px 0 1px transparentize(white, 0.4) inset
+    +button-led-bg($button-grey)
+    +button-led("normal")
 
     &:hover
-      +button-led(shade($button-grey, 30%))
-      box-shadow: 0 0 2px 0.6px black, 0 0 5px 1px transparentize(white, 0.9), 0 0 10px black inset, 1.5px 1px 1px transparentize(black, 0.3) inset, -0.5px 0 1px transparentize(black, 0.4) inset
+      +button-led-bg(shade($button-grey, 30%), 10%)
+      +button-led("hover")
 
-    &.active
-      +button-mute()
-      box-shadow: 0 0 2px 0.6px black, 0 0 5px 1px transparentize($mute-button-yellow, 0.6), 0 0 5px black inset, 1.5px 1px 1px transparentize(white, 0.3) inset, -0.5px 0 1px transparentize(white, 0.4) inset
+    &.mute
+      &.active
+        +button-mute()
+        +button-led("normal", $glowcolor:transparentize($mute-button-yellow, 0.6))
 
-      &:hover
-        +button-led(shade($mute-button-orange, 20%))
+        &:hover
+          +button-mute(20%)
+          +button-led("hover", $glowcolor:transparentize($mute-button-yellow, 0.9))
 
+    &.solo
+      &.active
+        +button-solo()
+        +button-led("normal", $glowcolor:transparentize($solo-button-orange, 0.6))
+
+        &:hover
+          +button-solo(20%)
+          +button-led("hover", $glowcolor:transparentize($solo-button-orange, 0.9))
     // &:active, &:focus
 
   .slider
