@@ -44,7 +44,7 @@ webpackConfig =
 
 # console.log webpackConfig.modules.loaders
 
-gulp.task 'clean', -> del ['dist']
+gulp.task 'clean', -> del ['docs']
 
 gulp.task 'styles', ->
 
@@ -65,7 +65,7 @@ gulp.task 'styles', ->
 
   merge(cssStream, sassStream)
     .pipe concat 'styles.css'
-    .pipe gulp.dest 'dist/css'
+    .pipe gulp.dest 'docs/css'
 
 
 gulp.task 'scripts', ->
@@ -77,22 +77,22 @@ gulp.task 'scripts', ->
       # gutil.log gutil.colors.red 'Webpack error:\n' + e.message
       @emit 'end'
     .pipe sourcemaps.write '.'
-    .pipe gulp.dest 'dist/js'
+    .pipe gulp.dest 'docs/js'
 
 
 gulp.task 'html', ->
   gulp.src 'src/*.html'
-    .pipe gulp.dest 'dist/'
+    .pipe gulp.dest 'docs/'
 
 
 gulp.task 'assets', ->
   gulp.src('src/assets/**')
     # .pipe imagemin optimizationLevel: 5
-    .pipe gulp.dest 'dist/assets/'
+    .pipe gulp.dest 'docs/assets/'
 
 
 gulp.task 'serve', ->
-  gulp.src 'dist'
+  gulp.src 'docs'
     .pipe server
       port: 5001
       livereload: true
