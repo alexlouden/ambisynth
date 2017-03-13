@@ -67,7 +67,7 @@ class VolumeSlider extends React.Component {
 
   constructor(props) {
     super(props)
-    this.state = {volume: 50}
+    this.state = {volume: 50, previousVolume: 50}
     this.handleChange = this.handleChange.bind(this)
   }
 
@@ -95,6 +95,8 @@ class ToggleButton extends React.Component {
 
   handleClick(event) {
     this.setState({active: !this.state.active})
+
+    // Call parent
     this.props.onToggle(!this.state.active)
   }
 
@@ -114,23 +116,54 @@ class Slider extends React.Component {
     super(props)
     this.onToggleMute = this.onToggleMute.bind(this)
     this.onToggleSolo = this.onToggleSolo.bind(this)
+    this.solo = false
+    this.mute = false
   }
 
   onToggleMute(active) {
+    this.setState({'mute': active})
+    this.muteSlider(active)
+
+    this.mute = active
+    this.props.update()
+  }
+
+  muteSlider(active) {
+    if (active) {
+      // toggle mute on - save volume
+      let currentVolume = this.slider.state.volume;
+      if (currentVolume > 0) {
+        this.slider.setState({previousVolume: currentVolume})
+      }
+      // slide to volume 0
+      this.slider.setState({volume: 0})
+
+    } else {
+      // toggle mute off - restore volume
+      this.slider.setState({volume: this.slider.state.previousVolume})
+    }
+
+    // mute Tone
     this.props.track.mute = active
   }
 
   onToggleSolo(active) {
-    // TODO solo
+    this.solo = active
+
+    if (active) {
+      this.slider.setState({volume: this.slider.state.volume})
+    }
+
+    this.props.update()
   }
 
   render() {
     return (
       <div className="slider">
         <h5>{this.props.track.name}</h5>
-        <ToggleButton name="mute" key={this.props.id} onToggle={this.onToggleMute}/>
-        <ToggleButton name="solo" key={this.props.id} onToggle={this.onToggleSolo}/>
-        <VolumeSlider track={this.props.track} key={this.props.id}/>
+        <ToggleButton name="mute" key={this.props.id} onToggle={this.onToggleMute} ref={b => this.muteButton = b}/>
+        <ToggleButton name="solo" key={this.props.id} onToggle={this.onToggleSolo} ref={b => this.soloButton = b}/>
+        <VolumeSlider track={this.props.track} key={this.props.id} ref={input => this.slider = input}/>
       </div>
     )
   }
@@ -138,11 +171,34 @@ class Slider extends React.Component {
 
 class SliderList extends React.Component {
 
+  constructor(props) {
+    super(props)
+    this.update = this.update.bind(this)
+  }
+
+  update() {
+
+    let soloEnabled = _.any(_.mapObject(this.refs, slider => slider.solo ))
+
+    _.mapObject(this.refs, (slider, id) => {
+
+      let mute;
+      if (soloEnabled) {
+        // Mute if solo is enabled and this track doesn't have solo enabled
+        mute = !slider.solo;
+      } else {
+        // Otherwise just use mute button
+        mute = slider.mute;
+      }
+      slider.muteSlider(mute)
+    })
+  }
+
   render() {
     return (
       <div className="mixer">
         {this.props.tracks.map( (track, id) =>
-          <Slider track={track} key={id}/>
+          <Slider track={track} key={id} ref={id} update={this.update}/>
         )}
       </div>
     )
